@@ -1,0 +1,42 @@
+# pipeline.yml
+
+# Определение названия pipeline
+name: Flutter Code Style Check
+
+# Определение сторонних сервисов, которые могут быть использованы в pipeline
+services:
+  - docker:dind
+
+# Определение переменных среды, необходимых для настройки pipeline
+variables:
+  DOCKER_DRIVER: overlay2
+
+# Определение шагов pipeline
+jobs:
+  # Определение job для проверки стиля кода
+  check_code_style:
+    # Определение образа Docker, который будет использоваться для выполнения задачи
+    docker:
+      - image: cirrusci/flutter
+    # Определение шагов, которые должны быть выполнены в рамках данного job
+    steps:
+      # Шаг установки зависимостей
+      - run:
+          name: Install dependencies
+          command: flutter pub get
+
+      # Шаг запуска анализатора стиля
+      - run:
+          name: Check code style
+          command: flutter analyze
+
+      # Шаг завершения работы
+      - run:
+          name: Finish
+          command: echo "Code style check completed successfully"
+
+# Определение конфигурации, при которой pipeline будет автоматически запускаться
+# при каждом push'е в репозиторий
+trigger:
+  event:
+    - push
